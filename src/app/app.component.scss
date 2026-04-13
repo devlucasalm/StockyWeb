@@ -1,0 +1,15 @@
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+ 
+}
+ 
+.app-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+   min-height: 0; 
+  background: #ffff;
+  color: #111827;
+}

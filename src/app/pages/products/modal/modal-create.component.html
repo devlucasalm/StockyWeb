@@ -1,0 +1,81 @@
+<div class="modal-overlay" (click)="onOverlayClick($event)">
+    <div class="modal">
+
+        <div class="modal__header">
+            <h2 class="modal__title">Novo Produto</h2>
+            <button class="modal__close" (click)="closed.emit()">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <label class="modal__image-upload" [class.modal__image-upload--filled]="preview()">
+            <input type="file" accept="image/*" (change)="onFileChange($event)" hidden />
+            <img *ngIf="preview()" [src]="preview()" alt="Preview" />
+            <ng-container *ngIf="!preview()">
+                <span class="material-symbols-outlined">add_photo_alternate</span>
+                <span class="upload-hint">Clique para adicionar imagem</span>
+            </ng-container>
+        </label>
+
+        <div class="modal__body">
+
+            <div class="field field--full">
+                <label class="field__label">Nome</label>
+                <input class="field__input" type="text" placeholder="Ex: Smartphone X200" [(ngModel)]="form.nome" />
+            </div>
+
+            <div class="field">
+                <label class="field__label">Preço (R$)</label>
+                <input class="field__input" type="number" min="0" step="0.01" placeholder="0,00"
+                    [(ngModel)]="form.preco" />
+            </div>
+
+            <div class="field">
+                <label class="field__label">Quantidade</label>
+                <input class="field__input" type="number" min="0" placeholder="0" [(ngModel)]="form.quantidade" />
+            </div>
+
+            <div class="field field--full">
+                <label class="field__label">Descrição</label>
+                <textarea class="field__input field__textarea" placeholder="Descreva o produto..." rows="3"
+                    [(ngModel)]="form.descricao"></textarea>
+            </div>
+
+            <div class="field field--full">
+                <label class="field__label">Categoria</label>
+
+                <div class="select-wrapper">
+                    <select class="field__input field__select" [(ngModel)]="form.categoryId"
+                        [disabled]="loadingCategories()">
+                        <option value="" disabled>
+                            {{ loadingCategories() ? 'Carregando...' : 'Selecione uma categoria' }}
+                        </option>
+                        <option *ngFor="let cat of categories()" [value]="cat.categoryId">
+                            {{ cat.nome }}
+                        </option>
+                    </select>
+                    <span class="select-arrow material-symbols-outlined">expand_more</span>
+                </div>
+            </div>
+
+            <div class="field field--full field--check">
+                <label class="toggle">
+                </label>
+            </div>
+
+            <p class="modal__error" *ngIf="error()">{{ error() }}</p>
+
+        </div>
+
+        <div class="modal__footer">
+            <button class="btn-cancel" (click)="closed.emit()" [disabled]="loading()">
+                Cancelar
+            </button>
+            <button class="btn-submit" (click)="onSubmit()" [disabled]="loading()">
+                <span class="spinner" *ngIf="loading()"></span>
+                {{ loading() ? 'Cadastrando...' : 'Cadastrar Produto' }}
+            </button>
+        </div>
+
+    </div>
+</div>

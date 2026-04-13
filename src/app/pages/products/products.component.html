@@ -1,0 +1,119 @@
+<div class="products">
+
+    <div class="products__header">
+        <div class="header-info">
+            <h1 class="header-info__title">Produtos</h1>
+            <p class="header-info__count">{{ total() }} produto(s) cadastrado(s)</p>
+        </div>
+        <button class="btn-new" (click)="onNewProduct()">
+            <span class="material-symbols-outlined">add</span>
+            Novo Produto
+        </button>
+    </div>
+
+    <div class="products__toolbar">
+        <div class="products__search">
+            <span class="search__icon material-symbols-outlined">search</span>
+            <input class="search__input" type="text" placeholder="Buscar por nome, ID ou categoria..."
+                [value]="searchTerm()" (input)="onSearch($event)" />
+        </div>
+
+        <button class="btn-toggle-inactive" [class.btn-toggle-inactive--active]="showInactive()"
+            (click)="toggleInactive()">
+            <span class="material-symbols-outlined">
+                {{ showInactive() ? 'visibility' : 'visibility_off' }}
+            </span>
+            {{ showInactive() ? 'Mostrar ativos' : 'Mostrar inativos' }}
+        </button>
+    </div>
+
+    <div class="products__loading" *ngIf="loading()">
+        <div class="spinner"></div>
+        <p>Carregando produtos...</p>
+    </div>
+
+    <div class="products__error" *ngIf="error() && !loading()">
+        <span class="material-symbols-outlined">error</span>
+        <p>{{ error() }}</p>
+        <button (click)="loadProducts()">Tentar novamente</button>
+    </div>
+
+    <ng-container *ngIf="!loading() && !error()">
+
+        <div class="products__grid">
+            <div class="product-card" [class.product-card--inactive]="!product.ativo"
+                *ngFor="let product of filteredProducts()">
+                <div class="product-card__image">
+                    <img *ngIf="product.imagemUrl" [src]="product.imagemUrl" [alt]="product.nome" />
+                    <div class="product-card__image-placeholder" *ngIf="!product.imagemUrl">
+                        <span class="material-symbols-outlined">add_photo_alternate</span>
+                    </div>
+                    <span class="product-card__inactive-tag" *ngIf="!product.ativo">Inativo</span>
+                </div>
+
+                <div class="product-card__body">
+                    <div class="product-card__title-row">
+                        <div>
+                            <h3 class="product-card__name">{{ product.nome }}</h3>
+                        </div>
+                        <span class="product-card__badge" *ngIf="product.category">
+                            {{ product.category.nome }}
+                        </span>
+                    </div>
+
+                    <p class="product-card__desc" *ngIf="product.descricao">{{ product.descricao }}</p>
+
+                    <div class="product-card__meta">
+                        <span class="product-card__price">{{ formatPrice(product.preco) }}</span>
+                        <span class="product-card__qty">Qtd: {{ product.quantidade }}</span>
+                    </div>
+                </div>
+
+                <div class="product-card__actions">
+                    <button class="action-btn action-btn--edit" (click)="onEdit(product)">
+                        <span class="material-symbols-outlined">edit_square</span>
+                        Editar
+                    </button>
+                    <button class="action-btn action-btn--delete" (click)="onDelete(product)">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="products__empty" *ngIf="filteredProducts().length === 0">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <p>Nenhum produto encontrado.</p>
+        </div>
+
+        <div class="products__pagination" *ngIf="hasPagination()">
+            <button class="page-btn page-btn--nav" [disabled]="currentPage() === 1"
+                (click)="goToPage(currentPage() - 1)">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+
+            <button *ngIf="pages()[0] > 1" class="page-btn" (click)="goToPage(1)">1</button>
+
+            <span class="page-ellipsis" *ngIf="pages()[0] > 2">…</span>
+
+            <button *ngFor="let p of pages()" class="page-btn" [class.page-btn--active]="p === currentPage()"
+                (click)="goToPage(p)">{{ p }}</button>
+
+            <span class="page-ellipsis" *ngIf="pages()[pages().length - 1] < totalPages() - 1">…</span>
+
+            <button *ngIf="pages()[pages().length - 1] < totalPages()" class="page-btn"
+                (click)="goToPage(totalPages())">{{ totalPages() }}</button>
+
+            <button class="page-btn page-btn--nav" [disabled]="currentPage() === totalPages()"
+                (click)="goToPage(currentPage() + 1)">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+        </div>
+
+    </ng-container>
+
+    <app-product-modal-create *ngIf="showCreateModal()" (closed)="showCreateModal.set(false)"
+        (created)="onProductCreated()"></app-product-modal-create>
+
+
+</div>
