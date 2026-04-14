@@ -115,5 +115,8 @@
     <app-product-modal-create *ngIf="showCreateModal()" (closed)="showCreateModal.set(false)"
         (created)="onProductCreated()"></app-product-modal-create>
 
+    <app-product-modal-update *ngIf="productToEdit()" [product]="productToEdit()!" (closed)="productToEdit.set(null)"
+        (updated)="onProductUpdated()"></app-product-modal-update>
+
 
 </div>

@@ -3,12 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../shared/services/product.service';
 import { Product } from '../../shared/models/product.interface';
-import { ProductModalCreateComponent } from './modal/modal-create.component';
+import { ProductModalCreateComponent } from './modal-create/modal-create.component';
+import { ProductModalUpdateComponent } from './modal-update/modal-update.component';
 
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [CommonModule, FormsModule, ProductModalCreateComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ProductModalCreateComponent,
+    ProductModalUpdateComponent,
+  ],
   templateUrl: './products.component.html',
   styleUrls: ['./products.component.scss'],
 })
@@ -23,6 +29,7 @@ export class ProductsComponent implements OnInit {
   currentPage = signal(1);
   showInactive = signal(false);
   showCreateModal = signal(false);
+  productToEdit = signal<Product | null>(null);
 
   readonly take = 11;
 
@@ -102,7 +109,7 @@ export class ProductsComponent implements OnInit {
   onNewProduct(): void {
     this.showCreateModal.set(true);
   }
-  onEdit(product: Product): void {}
+
   onDelete(product: Product): void {
     if (!confirm(`Deseja realmente excluir "${product.nome}"?`)) return;
 
@@ -116,16 +123,24 @@ export class ProductsComponent implements OnInit {
     });
   }
 
+  onProductCreated(): void {
+    this.loadProducts();
+  }
+  
+  onEdit(product: Product): void {
+    this.productToEdit.set(product);
+  }
+  
+  onProductUpdated(): void {
+    this.loadProducts();
+  }
+
   formatPrice(value: number): string {
     return value.toLocaleString('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     });
   }
-
-  onProductCreated(): void {
-  this.loadProducts();
-}
 
   toggleInactive(): void {
     this.showInactive.update((v) => !v);

@@ -1,1 +1,164 @@
-<p>category works!</p>
+<div class="categories">
+
+    <div class="categories__header">
+        <div class="header-info">
+            <h1 class="header-info__title">Categorias</h1>
+            <p class="header-info__count">{{ total() }} categoria(s) cadastrada(s)</p>
+        </div>
+        <button class="btn-new" (click)="openCreateModal()">
+            <span class="material-symbols-outlined">add</span>
+            Nova Categoria
+        </button>
+    </div>
+
+    <div class="categories__toolbar">
+        <div class="categories__search">
+            <span class="search__icon material-symbols-outlined">search</span>
+            <input class="search__input" type="text" placeholder="Buscar por nome ou descrição..."
+                [value]="searchTerm()" (input)="onSearch($event)" />
+        </div>
+    </div>
+
+    <div class="categories__loading" *ngIf="loading()">
+        <div class="spinner"></div>
+        <p>Carregando categorias...</p>
+    </div>
+
+    <div class="categories__error" *ngIf="error() && !loading()">
+        <span class="material-symbols-outlined">error</span>
+        <p>{{ error() }}</p>
+        <button (click)="loadCategories()">Tentar novamente</button>
+    </div>
+
+    <ng-container *ngIf="!loading() && !error()">
+
+        <div class="categories__table-wrapper">
+            <table class="categories__table">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Criado em</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let cat of filteredCategories()">
+                        <td class="td-name">{{ cat.nome }}</td>
+                        <td class="td-desc">{{ cat.descricao || '—' }}</td>
+                        <td class="td-date">{{ formatDate(cat.dataCriacao) }}</td>
+                        <td class="td-actions">
+                            <button class="action-btn action-btn--edit" (click)="openEditModal(cat)">
+                                <span class="material-symbols-outlined">edit_square</span>
+                                Editar
+                            </button>
+                            <button class="action-btn action-btn--delete" (click)="onDelete(cat)">
+                                <span class="material-symbols-outlined">delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="categories__empty" *ngIf="filteredCategories().length === 0">
+            <span class="material-symbols-outlined">sell</span>
+            <p>Nenhuma categoria encontrada.</p>
+        </div>
+
+        <div class="categories__pagination" *ngIf="hasPagination()">
+            <button class="page-btn page-btn--nav" [disabled]="currentPage() === 1"
+                (click)="goToPage(currentPage() - 1)">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </button>
+
+            <button *ngIf="pages()[0] > 1" class="page-btn" (click)="goToPage(1)">1</button>
+            <span class="page-ellipsis" *ngIf="pages()[0] > 2">…</span>
+
+            <button *ngFor="let p of pages()" class="page-btn" [class.page-btn--active]="p === currentPage()"
+                (click)="goToPage(p)">{{ p }}</button>
+
+            <span class="page-ellipsis" *ngIf="pages()[pages().length - 1] < totalPages() - 1">…</span>
+            <button *ngIf="pages()[pages().length - 1] < totalPages()" class="page-btn"
+                (click)="goToPage(totalPages())">{{ totalPages() }}</button>
+
+            <button class="page-btn page-btn--nav" [disabled]="currentPage() === totalPages()"
+                (click)="goToPage(currentPage() + 1)">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+        </div>
+
+    </ng-container>
+
+</div>
+
+<div class="modal-overlay" *ngIf="showCreateModal()" (click)="onCreateOverlay($event)">
+    <div class="modal">
+        <div class="modal__header">
+            <h2 class="modal__title">Nova Categoria</h2>
+            <button class="modal__close" (click)="showCreateModal.set(false)">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="modal__body">
+            <div class="field field--full">
+                <label class="field__label">Nome</label>
+                <input class="field__input" type="text" placeholder="Ex: Eletrônicos" [(ngModel)]="createForm.nome" />
+            </div>
+
+            <div class="field field--full">
+                <label class="field__label">Descrição</label>
+                <textarea class="field__input field__textarea" placeholder="Descreva a categoria..." rows="3"
+                    [(ngModel)]="createForm.descricao"></textarea>
+            </div>
+
+            <p class="modal__error" *ngIf="createError()">{{ createError() }}</p>
+        </div>
+
+        <div class="modal__footer">
+            <button class="btn-cancel" (click)="showCreateModal.set(false)"
+                [disabled]="createLoading()">Cancelar</button>
+            <button class="btn-submit" (click)="onCreateSubmit()" [disabled]="createLoading()">
+                <span class="spinner-sm" *ngIf="createLoading()"></span>
+                {{ createLoading() ? 'Cadastrando...' : 'Cadastrar Categoria' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" *ngIf="categoryToEdit()" (click)="onEditOverlay($event)">
+    <div class="modal">
+        <div class="modal__header">
+            <h2 class="modal__title">Editar Categoria</h2>
+            <button class="modal__close" (click)="categoryToEdit.set(null)">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="modal__body" *ngIf="editForm">
+            <div class="field field--full">
+                <label class="field__label">Nome</label>
+                <input class="field__input" type="text" placeholder="Ex: Eletrônicos" [(ngModel)]="editForm.nome" />
+            </div>
+
+            <div class="field field--full">
+                <label class="field__label">Descrição</label>
+                <textarea class="field__input field__textarea" placeholder="Descreva a categoria..." rows="3"
+                    [(ngModel)]="editForm.descricao"></textarea>
+            </div>
+
+            
+
+            <p class="modal__error" *ngIf="editError()">{{ editError() }}</p>
+        </div>
+
+        <div class="modal__footer">
+            <button class="btn-cancel" (click)="categoryToEdit.set(null)" [disabled]="editLoading()">Cancelar</button>
+            <button class="btn-submit" (click)="onEditSubmit()" [disabled]="editLoading()">
+                <span class="spinner-sm" *ngIf="editLoading()"></span>
+                {{ editLoading() ? 'Salvando...' : 'Salvar Alterações' }}
+            </button>
+        </div>
+    </div>
+</div>

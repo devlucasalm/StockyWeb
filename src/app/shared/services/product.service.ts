@@ -50,15 +50,21 @@ export class ProductService {
   ): Observable<AppResponse<ProductUpdate>> {
     const formData = new FormData();
 
-    formData.append('id', productUpdate.productId);
-    formData.append('nome', productUpdate.nome);
-    formData.append('descricao', productUpdate.descricao);
-    formData.append('preco', productUpdate.preco.toString());
-    formData.append('quantidade', productUpdate.quantidade.toString());
-    formData.append('ativo', productUpdate.ativo.toString());
+    formData.append('ProductId', productUpdate.productId);
+    formData.append('Nome', productUpdate.nome);
+    formData.append('Descricao', productUpdate.descricao);
+    formData.append('Preco', productUpdate.preco.toString());
+    formData.append('Quantidade', productUpdate.quantidade.toString());
+    if (
+      productUpdate.categoryId !== null &&
+      productUpdate.categoryId !== undefined
+    ) {
+      formData.append('CategoryId', productUpdate.categoryId);
+    }
+    formData.append('Ativo', productUpdate.ativo.toString());
 
     if (productUpdate.imagemUrl) {
-      formData.append('imagemFile', productUpdate.imagemUrl);
+      formData.append('Imagem', productUpdate.imagemUrl);
     }
 
     return this.http.put<AppResponse<ProductUpdate>>(
