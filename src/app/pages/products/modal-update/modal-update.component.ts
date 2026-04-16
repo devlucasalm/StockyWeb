@@ -86,31 +86,34 @@ export class ProductModalUpdateComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (!this.form.nome.trim()) {
-      this.error.set('O nome do produto é obrigatório.');
-      return;
-    }
-
-    
-
-    this.loading.set(true);
-    this.error.set(null);
-
-    const payload: ProductUpdate = {
-      ...this.form,
-      ativo: this.form.ativo === true,
-    };
-
-    this.productService.putProduct(payload).subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.updated.emit();
-        this.closed.emit();
-      },
-      error: () => {
-        this.loading.set(false);
-        this.error.set('Erro ao atualizar produto. Tente novamente.');
-      },
-    });
+  if (!this.form.nome.trim()) {
+    this.error.set('O nome do produto é obrigatório.');
+    return;
   }
+
+  this.loading.set(true);
+  this.error.set(null);
+
+  const precoConvertido = Number(
+    this.form.preco.toString().replace(',', '.')
+  );
+
+  const payload: ProductUpdate = {
+    ...this.form,
+    preco: precoConvertido, 
+    ativo: this.form.ativo === true,
+  };
+
+  this.productService.putProduct(payload).subscribe({
+    next: () => {
+      this.loading.set(false);
+      this.updated.emit();
+      this.closed.emit();
+    },
+    error: () => {
+      this.loading.set(false);
+      this.error.set('Erro ao atualizar produto. Tente novamente.');
+    },
+  });
+}
 }

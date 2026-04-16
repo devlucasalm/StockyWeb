@@ -53,7 +53,8 @@ export class ProductService {
     formData.append('ProductId', productUpdate.productId);
     formData.append('Nome', productUpdate.nome);
     formData.append('Descricao', productUpdate.descricao);
-    formData.append('Preco', productUpdate.preco.toString());
+    const precoFormatado = productUpdate.preco.toString().replace('.', ',');
+    formData.append('Preco', precoFormatado);
     formData.append('Quantidade', productUpdate.quantidade.toString());
     if (
       productUpdate.categoryId !== null &&

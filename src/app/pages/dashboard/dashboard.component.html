@@ -1,1 +1,93 @@
-<p>dashboard works!</p>
+<div class="dashboard">
+  <div class="dashboard__loading" *ngIf="loading()">
+    <div class="loader"></div>
+    <p>Carregando dashboard...</p>
+  </div>
+
+  <div class="dashboard__error" *ngIf="error() && !loading()">
+    <span class="material-symbols-outlined">error</span>
+    <p>{{ error() }}</p>
+    <button (click)="ngOnInit()">Tentar novamente</button>
+  </div>
+
+  <ng-container *ngIf="data() as d">
+    <div class="dashboard__header">
+      <div>
+        <h1 class="dashboard__title">Dashboard</h1>
+        <p class="dashboard__subtitle">Visão geral do seu estoque</p>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-card--green">
+        <div class="kpi-card__icon">
+          <span class="material-symbols-outlined">inventory_2</span>
+        </div>
+        <div class="kpi-card__body">
+          <span class="kpi-card__label">Total de Produtos</span>
+          <span class="kpi-card__value">{{ formatNumber(d.totalProdutos) }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card kpi-card--blue">
+        <div class="kpi-card__icon">
+          <span class="material-symbols-outlined">sell</span>
+        </div>
+        <div class="kpi-card__body">
+          <span class="kpi-card__label">Categorias</span>
+          <span class="kpi-card__value">{{ formatNumber(d.totalCategorias) }}</span>
+        </div>
+      </div>
+
+      <div class="kpi-card kpi-card--emerald">
+        <div class="kpi-card__icon">
+          <span class="material-symbols-outlined">check_circle</span>
+        </div>
+        <div class="kpi-card__body">
+          <span class="kpi-card__label">Produtos Ativos</span>
+          <span class="kpi-card__value">{{ formatNumber(d.produtosAtivos) }}</span>
+          <span class="kpi-card__sub">{{ d.produtosInativos }} inativos</span>
+        </div>
+      </div>
+
+      <div class="kpi-card kpi-card--amber">
+        <div class="kpi-card__icon">
+          <span class="material-symbols-outlined">payments</span>
+        </div>
+        <div class="kpi-card__body">
+          <span class="kpi-card__label">Valor do Estoque</span>
+          <span class="kpi-card__value kpi-card__value--sm">{{ formatCurrency(d.valorTotalEstoque) }}</span>
+          <span class="kpi-card__sub">{{ formatNumber(d.totalItensEstoque) }} itens</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-card__header chart-card__header--col">
+          <h3 class="chart-card__title">Estoque por Categoria</h3>
+          <p class="chart-card__subtitle">Quantidade de itens em estoque</p>
+        </div>
+        <div class="canvas-container">
+          <canvas #estoqueChart></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-card__header chart-card__header--col">
+          <h3 class="chart-card__title">Distribuição</h3>
+          <p class="chart-card__subtitle">Proporção por categoria</p>
+        </div>
+        <div class="canvas-container">
+          <canvas #distribuicaoChart></canvas>
+        </div>
+      </div>
+    </div>
+
+    
+      
+      <div class="table-responsive">
+        
+      </div>
+  </ng-container>
+</div>
