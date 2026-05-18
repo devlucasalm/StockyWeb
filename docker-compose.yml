@@ -1,0 +1,9 @@
+stocky-web:
+    build:
+      context: ./frontend/StockyWeb 
+      dockerfile: Dockerfile
+    container_name: stocky-frontend
+    ports:
+      - "4200:80" 
+    depends_on:
+      - stockyapi
